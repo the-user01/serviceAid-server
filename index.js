@@ -31,6 +31,8 @@ async function run() {
         // all collection
 
         const usersCollection = client.db("serviceAid").collection("users");
+        const serviceCollection = client.db("serviceAid").collection("services");
+        const messageCollection = client.db("serviceAid").collection("messages");
 
 
         // Users related api
@@ -38,7 +40,7 @@ async function run() {
         app.get('/users', async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result)
-          })
+        })
 
         app.post("/users", async (req, res) => {
             const user = req.body;
@@ -46,26 +48,64 @@ async function run() {
             const query = { email: user.email }
             const existingUser = await usersCollection.findOne(query);
             if (existingUser) {
-              return res.send({ message: 'user already exist' });
+                return res.send({ message: 'user already exist' });
             }
-      
+
             const result = await usersCollection.insertOne(user);
             res.send(result)
-          })
-      
-          app.delete('/users/:id', async (req, res) => {
+        })
+
+        app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await usersCollection.deleteOne(query);
             res.send(result);
-          })
+        })
 
-       
+
+        // Services related api
+
+        app.get('/services', async (req, res) => {
+            const result = await serviceCollection.find().toArray();
+            res.send(result)
+        })
+
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+
+            const result = await serviceCollection.findOne(query)
+            res.send(result);
+        })
+
+
+        // User Message Related Api
+
+        app.get('/messages', async (req, res) => {
+            const result = await messageCollection.find().toArray();
+            res.send(result)
+        })
+
+        app.post("/messages", async (req, res) => {
+            const message = req.body;
+            const result = await messageCollection.insertOne(message);
+            res.send(result)
+        })
+
+        app.delete('/messages/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await messageCollection.deleteOne(query);
+            res.send(result);
+        })
+
+
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
-       
+
     }
 }
 run().catch(console.dir);
