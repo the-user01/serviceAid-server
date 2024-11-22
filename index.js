@@ -110,6 +110,26 @@ async function run() {
 
         // Bookings related api
 
+        app.get('/bookings', async (req, res) => {
+            const result = await bookingCollection.find().toArray();
+            res.send(result)
+        })
+
+        app.patch('/bookings/canceled/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+
+            const updateStatus = {
+                $set:{
+                    status: "Canceled"
+                }
+            }
+
+            const result = await bookingCollection.updateOne(query, updateStatus)
+            
+            res.send(result);
+        })
+
         app.get('/bookings/:email', async (req, res) => {
             const email = req.params.email;
             const query = { userEmail: email };
