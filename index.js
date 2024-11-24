@@ -64,6 +64,8 @@ async function run() {
         })
 
 
+
+
         // Services related api
 
         app.get('/services', async (req, res) => {
@@ -88,6 +90,7 @@ async function run() {
         })
 
 
+
         // User Message Related Api
 
         app.get('/messages', async (req, res) => {
@@ -108,6 +111,9 @@ async function run() {
             res.send(result);
         })
 
+
+
+
         // Bookings related api
 
         app.get('/bookings', async (req, res) => {
@@ -120,23 +126,48 @@ async function run() {
             const query = { _id: new ObjectId(id) };
 
             const updateStatus = {
-                $set:{
+                $set: {
                     status: "Canceled"
                 }
             }
 
             const result = await bookingCollection.updateOne(query, updateStatus)
-            
+
             res.send(result);
         })
 
-        app.get('/bookings/:email', async (req, res) => {
+        app.patch('/bookings/report/:id', async (req, res) => {
+            const id = req.params.id;
+            const report = req.body;
+            const query = { _id: new ObjectId(id) };
+
+            const updateStatus = {
+                $set: {
+                    report
+                }
+            }
+
+            const result = await bookingCollection.updateOne(query, updateStatus)
+
+            res.send(result);
+        })
+
+
+        app.get('/bookings/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await bookingCollection.findOne(query);
+            res.send(result);
+        })
+
+        app.get('/bookings/email/:email', async (req, res) => {
             const email = req.params.email;
             const query = { userEmail: email };
-
             const result = await bookingCollection.find(query).toArray()
             res.send(result);
         })
+
+
 
         app.post("/bookings", async (req, res) => {
             const message = req.body;
@@ -144,12 +175,7 @@ async function run() {
             res.send(result)
         })
 
-        app.delete('/bookings/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) };
-            const result = await bookingCollection.deleteOne(query);
-            res.send(result);
-        })
+
 
 
 
