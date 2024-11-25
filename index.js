@@ -36,6 +36,36 @@ async function run() {
         const bookingCollection = client.db("serviceAid").collection("bookings");
 
 
+        // get Admin
+        app.get('/users/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email }
+            const user = await usersCollection.findOne(query)
+            let admin = false;
+            if (user) {
+                admin = user?.role === 'Admin'
+            }
+            res.send({ admin })
+        })
+
+
+        // get Customer
+        app.get('/users/customer/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email }
+            const user = await usersCollection.findOne(query)
+            let customer = false;
+            if (user) {
+                customer = user?.role === 'Customer'
+            }
+            res.send({ customer })
+        })
+
+
+
+
+
+
         // Users related api
 
         app.get('/users', async (req, res) => {
