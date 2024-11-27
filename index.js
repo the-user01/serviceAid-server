@@ -62,6 +62,19 @@ async function run() {
         })
 
 
+        // get Provider
+        app.get('/users/provider/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email }
+            const user = await usersCollection.findOne(query)
+            let provider = false;
+            if (user) {
+                provider = user?.role === 'Service Provider'
+            }
+            res.send({ provider })
+        })
+
+
 
 
 
