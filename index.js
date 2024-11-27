@@ -139,6 +139,13 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/services/email/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { providerEmail: email };
+            const result = await serviceCollection.find(query).toArray()
+            res.send(result);
+        })
+
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
@@ -187,6 +194,39 @@ async function run() {
             res.send(result)
         })
 
+        app.patch('/bookings/completed/:id', async (req, res) => {
+            const id = req.params.id;
+            const info = req.body;
+            const query = { _id: new ObjectId(id) };
+
+            const updateStatus = {
+                $set: {
+                    billAmount: info.billAmount,
+                    additionalNotes: info.additionalNotes,
+                    status: "Completed"
+                }
+            }
+
+            const result = await bookingCollection.updateOne(query, updateStatus)
+
+            res.send(result);
+        })
+
+        app.patch('/bookings/accept/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+
+            const updateStatus = {
+                $set: {
+                    status: "In Progress"
+                }
+            }
+
+            const result = await bookingCollection.updateOne(query, updateStatus)
+
+            res.send(result);
+        })
+
         app.patch('/bookings/canceled/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
@@ -229,6 +269,14 @@ async function run() {
         app.get('/bookings/email/:email', async (req, res) => {
             const email = req.params.email;
             const query = { userEmail: email };
+            const result = await bookingCollection.find(query).toArray()
+            res.send(result);
+        })
+
+
+        app.get('/bookings/providerName/:name', async (req, res) => {
+            const name = req.params.name;
+            const query = { providerName: name };
             const result = await bookingCollection.find(query).toArray()
             res.send(result);
         })
