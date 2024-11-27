@@ -86,6 +86,14 @@ async function run() {
             res.send(result)
         })
 
+          // get Provider
+          app.get('/users/serviceProvider/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email }
+            const user = await usersCollection.findOne(query)
+            res.send(user)
+        })
+
         app.post("/users", async (req, res) => {
             const user = req.body;
             // insert email if user doesn't exist
@@ -97,6 +105,21 @@ async function run() {
 
             const result = await usersCollection.insertOne(user);
             res.send(result)
+        })
+
+        app.patch('/users/approved/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+
+            const updateStatus = {
+                $set: {
+                    status: "Approved"
+                }
+            }
+
+            const result = await usersCollection.updateOne(query, updateStatus)
+
+            res.send(result);
         })
 
         app.delete('/users/:id', async (req, res) => {
