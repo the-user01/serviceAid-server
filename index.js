@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
@@ -75,6 +76,47 @@ async function run() {
         })
 
 
+        // Sending Emails related api
+
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: `${process.env.DB_Mail}`,
+                pass: `${process.env.DB_Mail_Pass}`,
+            },
+        });
+
+        const signature = `
+            <br><br>
+            Regards,<br>
+            -------------------<br>
+            <b>Sakib Hasan</b><br>
+            Admin<br>
+            <i>ServiceAid Company Ltd.</i>
+        `;
+
+        // API route to send email
+        app.post('/send-email', (req, res) => {
+            const { receiverMail, subject, description } = req.body;
+
+            const mailOptions = {
+                from: `${process.env.DB_Mail}`,
+                to: `${receiverMail}`,
+                subject: `${subject}`,
+                text: `${description}\n\nRegards,\n\nAdmin\nServiceAid Company Ltd.`,
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error(error);
+                    res.status(500).send({ message: 'Failed to send email' });
+                } else {
+                    res.status(200).send({ message: 'Email sent successfully!' });
+                }
+            });
+        });
+
+
 
 
 
@@ -86,8 +128,8 @@ async function run() {
             res.send(result)
         })
 
-          // get Provider
-          app.get('/users/serviceProvider/:email', async (req, res) => {
+        // get Provider
+        app.get('/users/serviceProvider/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email }
             const user = await usersCollection.findOne(query)
